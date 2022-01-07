@@ -1,0 +1,11 @@
+--- source/src/end.c
++++ newdir/src/end.c
+@@ -1348,7 +1348,7 @@
+     if (!survive && (wizard || discover) && how <= GENOCIDED
+         && !paranoid_query(ParanoidDie, "Die?")) {
+ #else
+-    if (!survive && (wizard || discover) && how <= GENOCIDED
++    if (!survive && (TRUE || wizard || discover) && how <= GENOCIDED
+         && !paranoid_query(ParanoidDie, "Ž€‚ñ‚Å‚Ý‚éH")) {
+ #endif
+ /*JP

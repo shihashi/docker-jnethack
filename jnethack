@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# local settings
+localdir=~
+localdotfiledir="${localdir}"
+localvardir="${localdir}/jnethackdir"
+defaultimage="shihashi/jnethack"
+
+localsavedir="${localvardir}/save"
+localbonesdir="${localvardir}/bones"
+
+localtzfile="/etc/localtime"
+
+containerdotfiledir="/root"
+containervardir="/nethack/games/lib/jnethackdir"
+
+logfiles="logfile record xlogfile"
+
+usage () {
+    echo
+    echo "Usage: jnethack [OPTIONS] [NETHACKOPTIONS]"
+    echo
+    echo "Options:"
+    echo "  -i, --image image    Spesify an image to derive the container from"
+    echo "  --timezone ID        Set the timezone"
+    echo
+
+    exit 1
+}
+
+checkfile () {
+    if [ -e $1 ]; then
+        if [ ! -f $1 ]; then
+            echo "$1 exists but is not a normal file."
+            exit 1
+        fi
+    else
+        touch $1
+    fi
+}
+
+checkdir () {
+    if [ -e $1 ]; then
+        if [ ! -d $1 ]; then
+            echo "$1 exists but is not a directory."
+            exit 1
+        fi
+    else
+        mkdir -p $1
+    fi
+}
+
+image="$defaultimage"
+pass=0
+
+for opt in "$@"
+do
+    if [[ $pass -eq 0 ]]; then
+        case $opt in
+            -i | --image)
+                if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                    usage
+                fi
+                image="$2"
+                shift 2
+                pass=1
+                ;;
+            *)
+                nethackargs+=("$1")
+                shift 1
+                ;;
+        esac
+    else
+        pass=0
+    fi
+done
+
+
+checkfile $localdotfiledir/.nethackrc
+args=("-v")
+args+=("${localdotfiledir}/.nethackrc:${containerdotfiledir}/.nethackrc")
+
+checkdir $localvardir
+
+for f in $logfiles
+do
+    checkfile $localvardir/$f
+    args+=("-v" "${localvardir}/$f:${containervardir}/$f")
+done
+
+checkdir $localsavedir
+args+=("-v" "${localsavedir}:${containervardir}/save")
+
+checkdir $localbonesdir
+args+=("-v" "${localbonesdir}:/bones")
+
+if [ -f /etc/localtime ]; then
+    args+=("-v" "$localtzfile:/localtime")
+fi
+
+docker run --rm -it --name jnethack "${args[@]}" "$image" "${nethackargs[@]}"
