@@ -1,4 +1,4 @@
-# docker-nethack
+# docker-jnethack
 JNethack 用の Dockerfile です。
 
 ## ゲームの遊び方
@@ -9,7 +9,7 @@ $ cd docker-jnethack
 $ ./jnethack
 ```
 このようにするとログファイルとセーブファイルが
-`~/nethackdir` 以下に作成されます。
+`~/jnethackdir` 以下に作成されます。
 ゲームの設定ファイルは `~/.nethackrc` です。
 
 ## チートする方法
@@ -20,15 +20,15 @@ $ ./jnethack
 
 パッチを適用してビルドしてください。
 ```
-$ git clone https://github.com/shihashi/docker-nethack
-$ cd docker-nethack/docker
+$ git clone https://github.com/shihashi/docker-jnethack
+$ cd docker-jnethack/docker
 $ ln -sf ../patches/monster.patch NetHack.patch
-$ docker build -t nethack-monster .
+$ docker build -t jnethack-monster .
 ```
 そして新しくできたイメージで `jnethack` を起動してください。
 ```
 $ cd ..
-$ ./nethack --image nethack-monster
+$ ./jnethack --image jnethack-monster
 ```
 
 ## 参照
